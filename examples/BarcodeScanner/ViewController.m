@@ -195,6 +195,9 @@
     case kBarcodeFormatUPCEANExtension:
       return @"UPC/EAN extension";
 
+    case kBarcodeFormatBlotCode:
+      return @"BlotCode";
+
     default:
       return @"Unknown";
   }

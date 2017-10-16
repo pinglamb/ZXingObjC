@@ -38,6 +38,9 @@
 #if defined(ZXINGOBJC_QRCODE) || !defined(ZXINGOBJC_USE_SUBSPECS)
 #import "ZXQRCodeReader.h"
 #endif
+#if defined(ZXINGOBJC_BLOTCODE) || !defined(ZXINGOBJC_USE_SUBSPECS)
+#import "ZXBlotCodeReader.h"
+#endif
 
 @interface ZXMultiFormatReader ()
 
@@ -145,6 +148,11 @@
       [self.readers addObject:[[ZXMaxiCodeReader alloc] init]];
     }
 #endif
+#if defined(ZXINGOBJC_BLOTCODE) || !defined(ZXINGOBJC_USE_SUBSPECS)
+      if ([hints containsFormat:kBarcodeFormatBlotCode]) {
+          [self.readers addObject:[[ZXBlotCodeReader alloc] init]];
+      }
+#endif
 #if defined(ZXINGOBJC_ONED) || !defined(ZXINGOBJC_USE_SUBSPECS)
     if (addZXOneDReader && tryHarder) {
       [self.readers addObject:[[ZXMultiFormatOneDReader alloc] initWithHints:hints]];
@@ -171,6 +179,9 @@
 #endif
 #if defined(ZXINGOBJC_MAXICODE) || !defined(ZXINGOBJC_USE_SUBSPECS)
     [self.readers addObject:[[ZXMaxiCodeReader alloc] init]];
+#endif
+#if defined(ZXINGOBJC_BLOTCODE) || !defined(ZXINGOBJC_USE_SUBSPECS)
+      [self.readers addObject:[[ZXBlotCodeReader alloc] init]];
 #endif
     if (tryHarder) {
 #if defined(ZXINGOBJC_ONED) || !defined(ZXINGOBJC_USE_SUBSPECS)

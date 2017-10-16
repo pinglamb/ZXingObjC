@@ -48,6 +48,8 @@ typedef enum {
   /** MaxiCode 2D barcode format. */
   kBarcodeFormatMaxiCode,
 
+  kBarcodeFormatBlotCode,
+
   /** PDF417 format. */
   kBarcodeFormatPDF417,
 

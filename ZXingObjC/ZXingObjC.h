@@ -41,6 +41,10 @@
 #import "ZXingObjCQRCode.h"
 #endif
 
+#if defined(ZXINGOBJC_BLOTCODE) || !defined(ZXINGOBJC_USE_SUBSPECS)
+#import "ZXingObjCBlotCode.h"
+#endif
+
 #import "ZXMultiFormatReader.h"
 #import "ZXMultiFormatWriter.h"
 
