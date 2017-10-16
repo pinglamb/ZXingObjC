@@ -1,5 +1,5 @@
 //
-//  ZXBlotCodeDecoder.m
+//  ZXBlotCodeDetector.m
 //  ZXingObjC
 //
 //  Created by Ping Lam on 16/10/2017.
@@ -18,6 +18,9 @@
 #import "ZXResultPointCallback.h"
 
 #import "ZXBlotCodeDetector.h"
+#import "ZXBlotCodeBull.h"
+#import "ZXBlotCodeBullFinder.h"
+#import "ZXBlotCodeBullInfo.h"
 
 
 @interface ZXBlotCodeDetector ()
@@ -42,7 +45,20 @@
 
 - (ZXDetectorResult *)detect:(ZXDecodeHints *)hints error:(NSError **)error {
     self.resultPointCallback = hints == nil ? nil : hints.resultPointCallback;
-    return nil;
+
+    ZXBlotCodeBullFinder *finder = [[ZXBlotCodeBullFinder alloc] initWithImage:self.image resultPointCallback:self.resultPointCallback];
+    ZXBlotCodeBullInfo *info = [finder find:hints error:error];
+    NSLog(@"%@", info);
+    if (!info) {
+        return nil;
+    }
+
+    return [self processBullInfo:info error:error];
+}
+
+- (ZXDetectorResult *)processBullInfo:(ZXBlotCodeBullInfo *)info error:(NSError **)error {
+    return [[ZXDetectorResult alloc] initWithBits:self.image points:@[]];
 }
 
 @end
+

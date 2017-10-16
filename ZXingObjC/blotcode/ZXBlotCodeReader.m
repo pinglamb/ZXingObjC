@@ -13,6 +13,7 @@
 #import "ZXErrors.h"
 #import "ZXIntArray.h"
 #import "ZXBlotCodeDecoder.h"
+#import "ZXBlotCodeDetector.h"
 #import "ZXBlotCodeReader.h"
 #import "ZXResult.h"
 #import "ZXByteArray.h"
@@ -38,16 +39,23 @@
 }
 
 - (ZXResult *)decode:(ZXBinaryBitmap *)image hints:(ZXDecodeHints *)hints error:(NSError **)error {
-    if (hints == nil) {
-        ZXByteArray *datawords = [[ZXByteArray alloc] initWithLength:94];
-        ZXResult *result = [ZXResult resultWithText:@"Hello"
-                                           rawBytes:datawords
-                                       resultPoints:@[]
-                                             format:kBarcodeFormatBlotCode];
-        return result;
-    } else {
+
+    ZXBitMatrix *matrix = [image blackMatrixWithError:error];
+    if (!matrix) {
         return nil;
     }
+
+    ZXDetectorResult *detectorResult = [[[ZXBlotCodeDetector alloc] initWithImage:matrix] detect:hints error:error];
+    if (!detectorResult) {
+        return nil;
+    }
+
+    ZXByteArray *datawords = [[ZXByteArray alloc] initWithLength:94];
+    ZXResult *result = [ZXResult resultWithText:@"Hello"
+                                       rawBytes:datawords
+                                   resultPoints:@[]
+                                         format:kBarcodeFormatBlotCode];
+    return result;
 }
 
 - (void)reset {
