@@ -48,7 +48,6 @@
 
     ZXBlotCodeBullFinder *finder = [[ZXBlotCodeBullFinder alloc] initWithImage:self.image resultPointCallback:self.resultPointCallback];
     ZXBlotCodeBullInfo *info = [finder find:hints error:error];
-    NSLog(@"%@", info);
     if (!info) {
         return nil;
     }

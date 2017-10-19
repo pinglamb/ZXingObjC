@@ -12,14 +12,12 @@
 @interface ZXBlotCodeBullFinder : NSObject
 
 @property (nonatomic, strong, readonly) ZXBitMatrix *image;
-@property (nonatomic, strong, readonly) NSMutableArray *possibleBulls;
+@property (nonatomic, strong) ZXBlotCodeBull *bull;
 
 - (id)initWithImage:(ZXBitMatrix *)image;
 
 - (id)initWithImage:(ZXBitMatrix *)image resultPointCallback:(id<ZXResultPointCallback>)resultPointCallback;
 
 - (ZXBlotCodeBullInfo *)find:(ZXDecodeHints *)hints error:(NSError **)error;
-
-+ (BOOL)foundBull:(const int[])stateCount;
 
 @end

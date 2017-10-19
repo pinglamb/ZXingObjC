@@ -15,10 +15,12 @@
 #import "ZXResultPoint.h"
 #import "ZXResultPointCallback.h"
 
+const int ZX_BLOT_CODE_BULL_MODULES = 10;
+const int ZX_BLOT_CODE_MAX_MODULES = 34;
+
 @interface ZXBlotCodeBullFinder ()
 
 @property (nonatomic, weak, readonly) id<ZXResultPointCallback> resultPointCallback;
-@property (nonatomic, strong) NSMutableArray *possibleBulls;
 
 @end
 
@@ -31,7 +33,6 @@
 - (id)initWithImage:(ZXBitMatrix *)image resultPointCallback:(id<ZXResultPointCallback>)resultPointCallback {
     if (self = [super init]) {
         _image = image;
-        _possibleBulls = [NSMutableArray array];
         _resultPointCallback = resultPointCallback;
     }
 
@@ -39,14 +40,19 @@
 }
 
 - (ZXBlotCodeBullInfo *)find:(ZXDecodeHints *)hints error:(NSError **)error {
-    int maxI = self.image.height;
-    int maxJ = self.image.width;
+    int maxX = self.image.width;
+    int maxY = self.image.height;
 
-    int jSkip = 3;
+    // Assume code takes up 1/4 of the image width
+    int minPixelsPerModule = maxX / 4 / ZX_BLOT_CODE_MAX_MODULES;
+    int xSkip = minPixelsPerModule;
+    if (xSkip < 3) {
+        xSkip = 3;
+    }
 
     BOOL done = NO;
-    int stateCount[5];
-    for (int j = jSkip - 1; j < maxJ && !done; j += jSkip) {
+    int stateCount[5] = {0, 0, 0, 0, 0};
+    for (int x = xSkip - 1; x < maxX && !done; x += xSkip) {
         stateCount[0] = 0;
         stateCount[1] = 0;
         stateCount[2] = 0;
@@ -54,20 +60,21 @@
         stateCount[4] = 0;
         int currentState = 0;
 
-        for (int i = 0; i < maxI; i++) {
-            if ([self.image getX:j y:i]) {
+        for (int y = 0; y < maxY; y++) {
+            if ([self.image getX:x y:y]) {
+                // It is a black pixel
                 if ((currentState & 1) == 1) {
+                    // currentState is counting white pixel, +1
                     currentState++;
                 }
                 stateCount[currentState]++;
             } else {
+                // It is a white pixel
                 if ((currentState & 1) == 0) {
+                    // currentState is counting black pixel
                     if (currentState == 4) {
-                        NSLog(@"State Count: [%d, %d, %d, %d, %d]", stateCount[0], stateCount[1], stateCount[2], stateCount[3], stateCount[4]);
-                        if (stateCount[0] > 20 && [ZXBlotCodeBullFinder foundBull:stateCount]) {
-                            NSLog(@"Found Bull");
-                            [self handlePossibleBull:stateCount i:i j:j];
-                            BOOL confirmed = YES;
+                        if ([self isBullCross:stateCount]) {
+                            BOOL confirmed = [self handlePossibleBull:stateCount x:x y:y];
                             if (confirmed) {
                                 done = YES;
                             } else {
@@ -102,27 +109,23 @@
             }
         }
 
-        if ([ZXBlotCodeBullFinder foundBull:stateCount]) {
-            // BOOL confirmed = YES;
-            [self handlePossibleBull:stateCount i:maxI j:j];
-            done = YES;
+        if ([self isBullCross:stateCount]) {
+            BOOL confirmed = [self handlePossibleBull:stateCount x:x y:maxY];
+            if (confirmed) {
+                done = YES;
+            }
         }
     }
 
-    ZXBlotCodeBull *bull = [self selectBull];
-    if (!bull) {
+    if (!self.bull) {
         if (error) *error = ZXNotFoundErrorInstance();
         return nil;
     }
 
-    return [[ZXBlotCodeBullInfo alloc] initWithBull:bull];
+    return [[ZXBlotCodeBullInfo alloc] initWithBull:self.bull];
 }
 
-- (float)centerFromEnd:(const int[])stateCount end:(int)end {
-    return (float)(end - stateCount[4] - stateCount[3]) - stateCount[2] / 2.0f;
-}
-
-+ (BOOL)foundBull:(const int[])stateCount {
+- (BOOL)isBullCross:(const int[])stateCount {
     int totalModuleSize = 0;
     for (int i = 0; i < 5; i++) {
         int count = stateCount[i];
@@ -131,11 +134,11 @@
         }
         totalModuleSize += count;
     }
-    if (totalModuleSize < 10) {
+    if (totalModuleSize < ZX_BLOT_CODE_BULL_MODULES) {
         return NO;
     }
-    float moduleSize = totalModuleSize / 10.0f;
-    float maxVariance = moduleSize / 4.0f;
+    float moduleSize = totalModuleSize / (float)ZX_BLOT_CODE_BULL_MODULES;
+    float maxVariance = moduleSize / 2.0f;
     // Allow less than 50% variance from 1-2-4-2-1 proportions
     return
     ABS(moduleSize - stateCount[0]) < maxVariance &&
@@ -145,21 +148,233 @@
     ABS(moduleSize - stateCount[4]) < maxVariance;
 }
 
-- (BOOL)handlePossibleBull:(const int[])stateCount i:(int)i j:(int)j {
+- (BOOL)handlePossibleBull:(const int[])stateCount x:(int)x y:(int)y {
     int stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2] + stateCount[3] + stateCount[4];
-    float centerJ = [self centerFromEnd:stateCount end:j];
-    float centerI = i;
-    float estimatedModuleSize = (float)stateCountTotal / 10.0f;
+    float centerX = x;
+    float centerY = (float)(y - stateCount[4] - stateCount[3]) - stateCount[2] / 2.0f;
 
-    ZXResultPoint *point = [[ZXBlotCodeBull alloc] initWithPosX:centerJ posY:centerI estimatedModuleSize:estimatedModuleSize];
-    [self.possibleBulls addObject:point];
-    if (self.resultPointCallback != nil) {
-        [self.resultPointCallback foundPossibleResultPoint:point];
+    ZXResultPoint *center1 = [[ZXResultPoint alloc] initWithX:centerX y:centerY];
+    ZXResultPoint *center2 = [self crossCheckFromLeft:center1 maxCount:stateCount[2] originalStateCountTotal:stateCountTotal];
+    if (center2 == nil) {
+        return NO;
     }
-    return YES;
+
+    ZXResultPoint *center3 = [self crossCheckFromRight:center2 maxCount:stateCount[2] originalStateCountTotal:stateCountTotal];
+    if (center3 == nil) {
+        return NO;
+    }
+
+    self.bull = [self crossCheckVertical:center3 maxCount:stateCount[2] originalStateCountTotal:stateCountTotal];
+    return self.bull != nil;
 }
 
-- (ZXBlotCodeBull *)selectBull {
-    return [self.possibleBulls firstObject];
+- (ZXResultPoint *)crossCheckFromLeft:(ZXResultPoint *)center maxCount:(int)maxCount originalStateCountTotal:(int)originalStateCountTotal {
+    int maxX = self.image.width;
+    int maxY = self.image.height;
+    int stateCount[5] = {0, 0, 0, 0, 0};
+    float startX, startY, endX, endY;
+
+    int i = 0;
+    while (center.x >= 2 * i && center.y >= i && [self.image getX:(center.x - 2 * i) y:(center.y - i)]) {
+        stateCount[2]++;
+        i++;
+    }
+    if (center.x < 2 * i || center.y < i) {
+        return nil;
+    }
+
+    while (center.x >= 2 * i && center.y >= i && ![self.image getX:(center.x - 2 * i) y:(center.y - i)] && stateCount[1] <= maxCount) {
+        stateCount[1]++;
+        i++;
+    }
+    if (center.x < 2 * i || center.y < i || stateCount[1] > maxCount) {
+        return nil;
+    }
+
+    while (center.x >= 2 * i && center.y >= i && [self.image getX:(center.x - 2 * i) y:(center.y - i)] && stateCount[0] <= maxCount) {
+        stateCount[0]++;
+        i++;
+        startX = center.x - 2 * i;
+        startY = center.y - i;
+    }
+    if (stateCount[0] > maxCount) {
+        return nil;
+    }
+
+    i = 1;
+    while (center.x + 2 * i < maxX && center.y + i < maxY && [self.image getX:(center.x + 2 * i) y:(center.y + i)]) {
+        stateCount[2]++;
+        i++;
+    }
+    if (center.x + 2 * i >= maxX || center.y + i >= maxY) {
+        return nil;
+    }
+
+    while (center.x + 2 * i < maxX && center.y + i < maxY && ![self.image getX:(center.x + 2 * i) y:(center.y + i)] && stateCount[3] < maxCount) {
+        stateCount[3]++;
+        i++;
+    }
+    if (center.x + 2 * i >= maxX || center.y + i >= maxY || stateCount[3] >= maxCount) {
+        return nil;
+    }
+
+    while (center.x + 2 * i < maxX && center.y + i < maxY && [self.image getX:(center.x + 2 * i) y:(center.y + i)] && stateCount[4] < maxCount) {
+        stateCount[4]++;
+        i++;
+        endX = center.x + 2 * i;
+        endY = center.y + i;
+    }
+    if (stateCount[4] >= maxCount) {
+        return nil;
+    }
+
+    int stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2] + stateCount[3] + stateCount[4];
+    if (5 * abs(stateCountTotal - originalStateCountTotal / 2) >= originalStateCountTotal / 2) {
+        return nil;
+    }
+
+    if ([self isBullCross:stateCount]) {
+        return [[ZXResultPoint alloc] initWithX:(startX + (endX - startX) / 2.0f) y:(startY + (endY - startY) / 2.0f)];
+    } else {
+        return nil;
+    }
 }
+
+- (ZXResultPoint *)crossCheckFromRight:(ZXResultPoint *)center maxCount:(int)maxCount originalStateCountTotal:(int)originalStateCountTotal {
+    int maxX = self.image.width;
+    int maxY = self.image.height;
+    int stateCount[5] = {0, 0, 0, 0, 0};
+    float startX, startY, endX, endY;
+
+    int i = 0;
+    while (center.x + 2 * i < maxX && center.y >= i && [self.image getX:(center.x + 2 * i) y:(center.y - i)]) {
+        stateCount[2]++;
+        i++;
+    }
+    if (center.x + 2 * i >= maxX || center.y < i) {
+        return nil;
+    }
+
+    while (center.x + 2 * i < maxX && center.y >= i && ![self.image getX:(center.x + 2 * i) y:(center.y - i)] && stateCount[3] <= maxCount) {
+        stateCount[3]++;
+        i++;
+    }
+    if (center.x + 2 * i >= maxX || center.y < i || stateCount[3] > maxCount) {
+        return nil;
+    }
+
+    while (center.x + 2 * i < maxX && center.y >= i && [self.image getX:(center.x + 2 * i) y:(center.y - i)] && stateCount[4] <= maxCount) {
+        stateCount[4]++;
+        i++;
+        endX = center.x + 2 * i;
+        endY = center.y - i;
+    }
+    if (stateCount[4] > maxCount) {
+        return nil;
+    }
+
+    i = 1;
+    while (center.x >= 2 * i && center.y + i < maxY && [self.image getX:(center.x - 2 * i) y:(center.y + i)]) {
+        stateCount[2]++;
+        i++;
+    }
+    if (center.x < 2 * i || center.y + i >= maxY) {
+        return nil;
+    }
+
+    while (center.x >= 2 * i && center.y + i < maxY && ![self.image getX:(center.x - 2 * i) y:(center.y + i)] && stateCount[1] < maxCount) {
+        stateCount[1]++;
+        i++;
+    }
+    if (center.x < 2 * i || center.y + i >= maxY || stateCount[1] >= maxCount) {
+        return nil;
+    }
+
+    while (center.x >= 2 * i && center.y + i < maxY && [self.image getX:(center.x - 2 * i) y:(center.y + i)] && stateCount[0] < maxCount) {
+        stateCount[0]++;
+        i++;
+        startX = center.x - 2 * i;
+        startY = center.y + i;
+    }
+    if (stateCount[0] >= maxCount) {
+        return nil;
+    }
+
+    int stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2] + stateCount[3] + stateCount[4];
+    if (5 * abs(stateCountTotal - originalStateCountTotal / 2) >= originalStateCountTotal / 2) {
+        return nil;
+    }
+
+    if ([self isBullCross:stateCount]) {
+        return [[ZXResultPoint alloc] initWithX:(startX + (endX - startX) / 2.0f) y:(endY + (startY - endY) / 2.0f)];
+    } else {
+        return nil;
+    }
+}
+
+- (ZXBlotCodeBull *)crossCheckVertical:(ZXResultPoint *)center maxCount:(int)maxCount originalStateCountTotal:(int)originalStateCountTotal {
+    int maxY = self.image.height;
+    int stateCount[5] = {0, 0, 0, 0, 0};
+
+    int x = center.x;
+    int y = center.y;
+    while (y >= 0 && [self.image getX:x y:y]) {
+        stateCount[2]++;
+        y--;
+    }
+    if (y < 0) {
+        return nil;
+    }
+    while (y >= 0 && ![self.image getX:x y:y] && stateCount[1] <= maxCount) {
+        stateCount[1]++;
+        y--;
+    }
+    if (y < 0 || stateCount[1] > maxCount) {
+        return nil;
+    }
+    while (y >= 0 && [self.image getX:x y:y] && stateCount[0] <= maxCount) {
+        stateCount[0]++;
+        y--;
+    }
+    if (stateCount[0] > maxCount) {
+        return nil;
+    }
+    y = center.y + 1;
+    while (y < maxY && [self.image getX:x y:y]) {
+        stateCount[2]++;
+        y++;
+    }
+    if (y == maxY) {
+        return nil;
+    }
+    while (y < maxY && ![self.image getX:x y:y] && stateCount[3] < maxCount) {
+        stateCount[3]++;
+        y++;
+    }
+    if (y == maxY || stateCount[3] >= maxCount) {
+        return nil;
+    }
+    while (y < maxY && [self.image getX:x y:y] && stateCount[4] < maxCount) {
+        stateCount[4]++;
+        y++;
+    }
+    if (stateCount[4] >= maxCount) {
+        return nil;
+    }
+
+    int stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2] + stateCount[3] + stateCount[4];
+    if (5 * abs(stateCountTotal - originalStateCountTotal) >= originalStateCountTotal) {
+        return nil;
+    }
+
+    if ([self isBullCross:stateCount]) {
+        float centerX = center.x;
+        float centerY = (float)(y - stateCount[4] - stateCount[3]) - stateCount[2] / 2.0f;
+        float estimatedModuleSize = stateCountTotal * 1.0f / ZX_BLOT_CODE_BULL_MODULES;
+        return [[ZXBlotCodeBull alloc] initWithPosX:centerX posY:centerY estimatedModuleSize:estimatedModuleSize];
+    } else {
+        return nil;
+    }
+}
+
 @end
