@@ -22,6 +22,7 @@
 #import "ZXBlotCodeBullFinder.h"
 #import "ZXBlotCodeBullInfo.h"
 
+const float ZX_BLOT_CODE_MODULE_OVERLAP = 0.134f;
 
 @interface ZXBlotCodeDetector ()
 
@@ -52,11 +53,52 @@
         return nil;
     }
 
-    return [self processBullInfo:info error:error];
+    ZXBlotCodeBull *bull = info.bull;
+    float moduleSize = bull.estimatedModuleSize;
+    if (moduleSize < 1.0f) {
+        return nil;
+    }
+
+    // Check if the whole blotcode is visible
+    float width = bull.estimatedModuleSize * 36;
+    float height = bull.estimatedModuleSize * 36 - ZX_BLOT_CODE_MODULE_OVERLAP * bull.estimatedModuleSize * 4 * 8;
+    float left = bull.x - width / 2;
+    float top = bull.y - height / 2;
+    if (left < 0 ||
+        top < 0 ||
+        (left + width) >= self.image.width ||
+        (top + height) >= self.image.height) {
+        return nil;
+    }
+
+    ZXResultPoint *topLeft = [[ZXResultPoint alloc] initWithX:left y:top];
+
+    // Check if the orientation bits match [0 0 1 1 0 1]
+    if (!(![self extractBit:topLeft x:3 y:2 moduleSize:moduleSize] &&
+          ![self extractBit:topLeft x:5 y:2 moduleSize:moduleSize] &&
+           [self extractBit:topLeft x:2 y:4 moduleSize:moduleSize] &&
+           [self extractBit:topLeft x:6 y:4 moduleSize:moduleSize] &&
+          ![self extractBit:topLeft x:3 y:6 moduleSize:moduleSize] &&
+           [self extractBit:topLeft x:5 y:6 moduleSize:moduleSize])) {
+        return nil;
+    }
+
+    ZXBitMatrix *bits = [[ZXBitMatrix alloc] initWithWidth:9 height:9];
+    for (int x = 0; x < 9; x++) {
+        for (int y = 0; y < 9; y++) {
+            if ([self extractBit:topLeft x:x y:y moduleSize:moduleSize]) {
+                [bits setX:x y:y];
+            }
+        }
+    }
+
+    return [[ZXDetectorResult alloc] initWithBits:bits points:@[bull, topLeft]];
 }
 
-- (ZXDetectorResult *)processBullInfo:(ZXBlotCodeBullInfo *)info error:(NSError **)error {
-    return [[ZXDetectorResult alloc] initWithBits:self.image points:@[]];
+- (BOOL)extractBit:(ZXResultPoint *)origin x:(int)mx y:(int)my moduleSize:(float)moduleSize {
+    int x = origin.x + moduleSize * 2 + origin.x + moduleSize * 2 * (my & 0x01) +  mx * moduleSize * 4;
+    int y = origin.y + moduleSize * 2 + my * moduleSize * 4 - my * moduleSize * 4 * ZX_BLOT_CODE_MODULE_OVERLAP;
+    return [self.image getX:x y:y];
 }
 
 @end

@@ -15,9 +15,6 @@
 #import "ZXResultPoint.h"
 #import "ZXResultPointCallback.h"
 
-const int ZX_BLOT_CODE_BULL_MODULES = 10;
-const int ZX_BLOT_CODE_MAX_MODULES = 34;
-
 @interface ZXBlotCodeBullFinder ()
 
 @property (nonatomic, weak, readonly) id<ZXResultPointCallback> resultPointCallback;
@@ -44,7 +41,7 @@ const int ZX_BLOT_CODE_MAX_MODULES = 34;
     int maxY = self.image.height;
 
     // Assume code takes up 1/4 of the image width
-    int minPixelsPerModule = maxX / 4 / ZX_BLOT_CODE_MAX_MODULES;
+    int minPixelsPerModule = maxX / 4 / 36;
     int xSkip = minPixelsPerModule;
     if (xSkip < 3) {
         xSkip = 3;
@@ -134,12 +131,12 @@ const int ZX_BLOT_CODE_MAX_MODULES = 34;
         }
         totalModuleSize += count;
     }
-    if (totalModuleSize < ZX_BLOT_CODE_BULL_MODULES) {
+    if (totalModuleSize < 8) {
         return NO;
     }
-    float moduleSize = totalModuleSize / (float)ZX_BLOT_CODE_BULL_MODULES;
-    float maxVariance = moduleSize / 2.0f;
-    // Allow less than 50% variance from 1-2-4-2-1 proportions
+    float moduleSize = (stateCount[1] + stateCount[2] + stateCount[3]) / 8;
+    float maxVariance = moduleSize / 4.0f;
+    // Allow less than 25% variance from 1-2-4-2-1 proportions
     return
     ABS(moduleSize - stateCount[0]) < maxVariance &&
     ABS(2.0f * moduleSize - stateCount[1]) < 2 * maxVariance &&
@@ -370,7 +367,7 @@ const int ZX_BLOT_CODE_MAX_MODULES = 34;
     if ([self isBullCross:stateCount]) {
         float centerX = center.x;
         float centerY = (float)(y - stateCount[4] - stateCount[3]) - stateCount[2] / 2.0f;
-        float estimatedModuleSize = stateCountTotal * 1.0f / ZX_BLOT_CODE_BULL_MODULES;
+        float estimatedModuleSize = (stateCount[1] + stateCount[2] + stateCount[3]) * 1.0f / 8;
         return [[ZXBlotCodeBull alloc] initWithPosX:centerX posY:centerY estimatedModuleSize:estimatedModuleSize];
     } else {
         return nil;
