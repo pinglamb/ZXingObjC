@@ -7,6 +7,7 @@
 //
 
 #import "ZXBitMatrix.h"
+#import "ZXBitArray.h"
 #import "ZXByteArray.h"
 #import "ZXDecodeHints.h"
 #import "ZXDecoderResult.h"
@@ -43,11 +44,22 @@
         return nil;
     }
 
-    NSLog(@"Parsing ...............");
     ZXBitArray *codewords = [parser readCodewords];
-    NSLog(@"%@", codewords);
+    ZXByteArray *bytes = [[ZXByteArray alloc] initWithLength:4];
+    [codewords toBytes:0 array:bytes offset:0 numBytes:4];
+    uint32_t intV = 0;
+    for (int i = 0; i < 32; i++) {
+        if ([codewords get:i]) {
+            intV |= (1 << i);
+        }
+    }
 
-    return nil;
+    NSString *text = [NSString stringWithFormat:@"0x%02x", intV];
+
+    return [[ZXDecoderResult alloc] initWithRawBytes:bytes
+                                                text:text
+                                        byteSegments:nil
+                                             ecLevel:@""];
 }
 
 @end

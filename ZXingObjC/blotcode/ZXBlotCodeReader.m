@@ -50,10 +50,17 @@
         return nil;
     }
 
-    NSLog(@"Decoding ...........");
-    [self.decoder decode:detectorResult.bits hints:hints error:error];
+    ZXDecoderResult *decoderResult = [self.decoder decode:detectorResult.bits hints:hints error:error];
+    if (!decoderResult) {
+        return nil;
+    }
 
-    return nil;
+    ZXResult *result = [ZXResult resultWithText:decoderResult.text
+                                       rawBytes:decoderResult.rawBytes
+                                   resultPoints:detectorResult.points
+                                         format:kBarcodeFormatBlotCode];
+
+    return result;
 }
 
 - (void)reset {

@@ -92,7 +92,7 @@ const float ZX_BLOT_CODE_MODULE_OVERLAP = 0.134f;
         }
     }
 
-    return [[ZXDetectorResult alloc] initWithBits:bits points:@[bull, topLeft]];
+    return [[ZXDetectorResult alloc] initWithBits:bits points:@[bull]];
 }
 
 - (BOOL)extractBit:(ZXResultPoint *)origin x:(int)mx y:(int)my moduleSize:(float)moduleSize {
