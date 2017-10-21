@@ -1669,6 +1669,14 @@
 		25FE5D4016D0B84C00826CDB /* ZXRSSExpandedStackedInternalTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 25FE5D3F16D0B84C00826CDB /* ZXRSSExpandedStackedInternalTestCase.m */; };
 		25FE5D4316D0B8B200826CDB /* ZXTestCaseUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 25FE5D4216D0B8B200826CDB /* ZXTestCaseUtil.m */; };
 		25FE5D4516D1997C00826CDB /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 25FE5D4416D1997C00826CDB /* Resources */; };
+		829485361F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 829485351F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h */; };
+		829485371F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 829485351F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h */; };
+		829485381F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 829485351F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h */; };
+		829485391F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 829485351F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h */; };
+		8294853B1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8294853A1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m */; };
+		8294853C1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8294853A1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m */; };
+		8294853D1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8294853A1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m */; };
+		8294853E1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8294853A1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m */; };
 		829991E71F93E17400D8895E /* ZXBlotCodeReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 829991E61F93E17400D8895E /* ZXBlotCodeReader.m */; };
 		829991E81F93E17400D8895E /* ZXBlotCodeReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 829991E61F93E17400D8895E /* ZXBlotCodeReader.m */; };
 		829991EA1F93E18C00D8895E /* ZXBlotCodeReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 829991E91F93E18C00D8895E /* ZXBlotCodeReader.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2937,6 +2945,8 @@
 		25FE5D4116D0B8B100826CDB /* ZXTestCaseUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXTestCaseUtil.h; sourceTree = "<group>"; };
 		25FE5D4216D0B8B200826CDB /* ZXTestCaseUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZXTestCaseUtil.m; sourceTree = "<group>"; };
 		25FE5D4416D1997C00826CDB /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
+		829485351F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZXBlotCodeBitMatrixParser.h; sourceTree = "<group>"; };
+		8294853A1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZXBlotCodeBitMatrixParser.m; sourceTree = "<group>"; };
 		829991E61F93E17400D8895E /* ZXBlotCodeReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZXBlotCodeReader.m; sourceTree = "<group>"; };
 		829991E91F93E18C00D8895E /* ZXBlotCodeReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXBlotCodeReader.h; sourceTree = "<group>"; };
 		829991EC1F93E1B200D8895E /* ZXingObjCBlotCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXingObjCBlotCode.h; sourceTree = "<group>"; };
@@ -4310,6 +4320,8 @@
 			children = (
 				829991F61F93E33700D8895E /* ZXBlotCodeDecoder.h */,
 				829991FB1F93E35100D8895E /* ZXBlotCodeDecoder.m */,
+				829485351F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h */,
+				8294853A1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m */,
 			);
 			path = decoder;
 			sourceTree = "<group>";
@@ -4429,6 +4441,7 @@
 				0210FB7318E0A5FD00B1F4CE /* ZXResultParser.h in Headers */,
 				0210FBC418E0A8DA00B1F4CE /* ZXAI01AndOtherAIs.h in Headers */,
 				0210FB7418E0A5FD00B1F4CE /* ZXSMSMMSResultParser.h in Headers */,
+				829485361F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h in Headers */,
 				0210FC1518E0A9FB00B1F4CE /* ZXQRCodeMode.h in Headers */,
 				0210FBF918E0A97200B1F4CE /* ZXPDF417BoundingBox.h in Headers */,
 				0210FC2318E0AA6600B1F4CE /* ZXQRCodeMatrixUtil.h in Headers */,
@@ -4681,6 +4694,7 @@
 				0294D124190ED90B00BBACCB /* ZXingObjCCore.h in Headers */,
 				2540456E166ABAF000E13304 /* ZXDataMatrixDecodedBitStreamParser.h in Headers */,
 				2519AB7717FE649000A71C45 /* ZXPDF417Codeword.h in Headers */,
+				829485371F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h in Headers */,
 				2540456F166ABAF000E13304 /* ZXDataMatrixDecoder.h in Headers */,
 				25404570166ABAF000E13304 /* ZXDataMatrixVersion.h in Headers */,
 				25B62DF818DDDDB5004782B1 /* ZXVINParsedResult.h in Headers */,
@@ -4933,6 +4947,7 @@
 				0294D125190ED90B00BBACCB /* ZXingObjCCore.h in Headers */,
 				255E486718143A8800A03A28 /* ZXDataMatrixDecodedBitStreamParser.h in Headers */,
 				255E486818143A8800A03A28 /* ZXDataMatrixDecoder.h in Headers */,
+				829485381F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h in Headers */,
 				255E486918143A8800A03A28 /* ZXDataMatrixVersion.h in Headers */,
 				255E486A18143A8800A03A28 /* ZXDataMatrixDetector.h in Headers */,
 				25B62DF918DDDDB5004782B1 /* ZXVINParsedResult.h in Headers */,
@@ -5185,6 +5200,7 @@
 				DB7259FB1A52475000EFF81B /* ZXQRCodeDetector.h in Headers */,
 				DB72599C1A52458D00EFF81B /* ZXMultipleBarcodeReader.h in Headers */,
 				DB7259BA1A52460100EFF81B /* ZXCodaBarReader.h in Headers */,
+				829485391F9B2EAF001ABE7D /* ZXBlotCodeBitMatrixParser.h in Headers */,
 				DB7259911A52455300EFF81B /* ZXDataMatrixSymbolInfo144.h in Headers */,
 				DB7259AE1A5245B000EFF81B /* ZXRSSExpandedFieldParser.h in Headers */,
 				DB7259EC1A52472300EFF81B /* ZXPDF417Reader.h in Headers */,
@@ -5553,6 +5569,7 @@
 				0218B86018D232340005E7EC /* ZXAztecSimpleToken.m in Sources */,
 				25403D61166A9A0800E13304 /* ZXEmailAddressResultParser.m in Sources */,
 				0294D11A190ED90B00BBACCB /* ZXEncodeHints.m in Sources */,
+				8294853B1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m in Sources */,
 				0294D165190EDAA300BBACCB /* ZXMultiDetector.m in Sources */,
 				25403D63166A9A0800E13304 /* ZXEmailDoCoMoResultParser.m in Sources */,
 				0294D120190ED90B00BBACCB /* ZXErrors.m in Sources */,
@@ -5919,6 +5936,7 @@
 				0218B86118D232340005E7EC /* ZXAztecSimpleToken.m in Sources */,
 				2540419B166AAE6000E13304 /* ZXEmailAddressResultParser.m in Sources */,
 				0294D11B190ED90B00BBACCB /* ZXEncodeHints.m in Sources */,
+				8294853C1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m in Sources */,
 				0294D166190EDAA300BBACCB /* ZXMultiDetector.m in Sources */,
 				2540419C166AAE6000E13304 /* ZXEmailDoCoMoResultParser.m in Sources */,
 				0294D121190ED90B00BBACCB /* ZXErrors.m in Sources */,
@@ -6285,6 +6303,7 @@
 				0218B86218D232340005E7EC /* ZXAztecSimpleToken.m in Sources */,
 				25404654166ABBED00E13304 /* ZXEmailAddressResultParser.m in Sources */,
 				0294D11C190ED90B00BBACCB /* ZXEncodeHints.m in Sources */,
+				8294853D1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m in Sources */,
 				0294D167190EDAA300BBACCB /* ZXMultiDetector.m in Sources */,
 				25404655166ABBED00E13304 /* ZXEmailDoCoMoResultParser.m in Sources */,
 				0294D122190ED90B00BBACCB /* ZXErrors.m in Sources */,
@@ -6519,6 +6538,7 @@
 				DB7257601A52420400EFF81B /* ZXAztecSimpleToken.m in Sources */,
 				DB7257611A52420400EFF81B /* ZXEmailAddressResultParser.m in Sources */,
 				DB7257621A52420400EFF81B /* ZXEncodeHints.m in Sources */,
+				8294853E1F9B2ED6001ABE7D /* ZXBlotCodeBitMatrixParser.m in Sources */,
 				DB7257631A52420400EFF81B /* ZXMultiDetector.m in Sources */,
 				DB7257641A52420400EFF81B /* ZXEmailDoCoMoResultParser.m in Sources */,
 				DB7257651A52420400EFF81B /* ZXErrors.m in Sources */,

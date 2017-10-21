@@ -10,6 +10,7 @@
 #import "ZXBitMatrix.h"
 #import "ZXDecodeHints.h"
 #import "ZXDecoderResult.h"
+#import "ZXDetectorResult.h"
 #import "ZXErrors.h"
 #import "ZXIntArray.h"
 #import "ZXBlotCodeDecoder.h"
@@ -39,7 +40,6 @@
 }
 
 - (ZXResult *)decode:(ZXBinaryBitmap *)image hints:(ZXDecodeHints *)hints error:(NSError **)error {
-
     ZXBitMatrix *matrix = [image blackMatrixWithError:error];
     if (!matrix) {
         return nil;
@@ -50,12 +50,10 @@
         return nil;
     }
 
-    ZXByteArray *datawords = [[ZXByteArray alloc] initWithLength:94];
-    ZXResult *result = [ZXResult resultWithText:@"Hello"
-                                       rawBytes:datawords
-                                   resultPoints:@[]
-                                         format:kBarcodeFormatBlotCode];
-    return result;
+    NSLog(@"Decoding ...........");
+    [self.decoder decode:detectorResult.bits hints:hints error:error];
+
+    return nil;
 }
 
 - (void)reset {

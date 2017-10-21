@@ -13,8 +13,7 @@
 #import "ZXErrors.h"
 #import "ZXGenericGF.h"
 #import "ZXIntArray.h"
-// #import "ZXBlotCodeBitMatrixParser.h"
-// #import "ZXBlotCodeDecodedBitStreamParser.h"
+#import "ZXBlotCodeBitMatrixParser.h"
 #import "ZXBlotCodeDecoder.h"
 #import "ZXReedSolomonDecoder.h"
 
@@ -39,6 +38,15 @@
 }
 
 - (ZXDecoderResult *)decode:(ZXBitMatrix *)bits hints:(ZXDecodeHints *)hints error:(NSError **)error {
+    ZXBlotCodeBitMatrixParser *parser = [[ZXBlotCodeBitMatrixParser alloc] initWithBitMatrix:bits error:error];
+    if (!parser) {
+        return nil;
+    }
+
+    NSLog(@"Parsing ...............");
+    ZXBitArray *codewords = [parser readCodewords];
+    NSLog(@"%@", codewords);
+
     return nil;
 }
 
