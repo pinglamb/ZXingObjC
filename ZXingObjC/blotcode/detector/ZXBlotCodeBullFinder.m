@@ -41,7 +41,7 @@
     int maxY = self.image.height;
 
     // Assume code takes up 1/4 of the image width
-    int minPixelsPerModule = maxX / 4 / 36;
+    int minPixelsPerModule = 3; // maxX / 4 / 36;
     int xSkip = minPixelsPerModule;
     if (xSkip < 3) {
         xSkip = 3;
@@ -131,12 +131,12 @@
         }
         totalModuleSize += count;
     }
-    if (totalModuleSize < 8) {
+    if (totalModuleSize < 10) {
         return NO;
     }
     float moduleSize = (stateCount[1] + stateCount[2] + stateCount[3]) / 8;
-    float maxVariance = moduleSize / 4.0f;
-    // Allow less than 25% variance from 1-2-4-2-1 proportions
+    float maxVariance = moduleSize / 5.0f;
+    // Allow less than 20% variance from 1-2-4-2-1 proportions
     return
     ABS(moduleSize - stateCount[0]) < maxVariance &&
     ABS(2.0f * moduleSize - stateCount[1]) < 2 * maxVariance &&
@@ -162,7 +162,11 @@
     }
 
     self.bull = [self crossCheckVertical:center3 maxCount:stateCount[2] originalStateCountTotal:stateCountTotal];
-    return self.bull != nil;
+    if (self.bull == nil) {
+        return NO;
+    }
+
+    return YES;
 }
 
 - (ZXResultPoint *)crossCheckFromLeft:(ZXResultPoint *)center maxCount:(int)maxCount originalStateCountTotal:(int)originalStateCountTotal {

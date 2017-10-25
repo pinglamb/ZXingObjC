@@ -41,6 +41,7 @@
 - (ZXDecoderResult *)decode:(ZXBitMatrix *)bits hints:(ZXDecodeHints *)hints error:(NSError **)error {
     ZXBlotCodeBitMatrixParser *parser = [[ZXBlotCodeBitMatrixParser alloc] initWithBitMatrix:bits error:error];
     if (!parser) {
+        NSLog(@"Failed to init parser");
         return nil;
     }
 

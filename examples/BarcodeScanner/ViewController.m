@@ -23,6 +23,8 @@
 @property (nonatomic, weak) IBOutlet UIView *scanRectView;
 @property (nonatomic, weak) IBOutlet UILabel *decodedLabel;
 
+@property (nonatomic, strong) NSMutableArray *pointViews;
+
 @end
 
 @implementation ViewController {
@@ -46,6 +48,8 @@
 
   [self.view bringSubviewToFront:self.scanRectView];
   [self.view bringSubviewToFront:self.decodedLabel];
+
+    self.pointViews = [[NSMutableArray alloc] initWithCapacity:7];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -211,11 +215,22 @@
 	CGAffineTransform inverse = CGAffineTransformInvert(_captureSizeTransform);
 	NSMutableArray *points = [[NSMutableArray alloc] init];
 	NSString *location = @"";
-	for (ZXResultPoint *resultPoint in result.resultPoints) {
+    for (UIView *view in self.pointViews) {
+        [view removeFromSuperview];
+    }
+    [self.pointViews removeAllObjects];
+    for (ZXResultPoint *resultPoint in result.resultPoints) {
 		CGPoint cgPoint = CGPointMake(resultPoint.x, resultPoint.y);
 		CGPoint transformedPoint = CGPointApplyAffineTransform(cgPoint, inverse);
 		transformedPoint = [self.scanRectView convertPoint:transformedPoint toView:self.scanRectView.window];
-		NSValue* windowPointValue = [NSValue valueWithCGPoint:transformedPoint];
+
+        CGRect rect = CGRectMake(transformedPoint.x - 2, transformedPoint.y - 2, 4, 4);
+        UIView *view = [[UIView alloc] initWithFrame:rect];
+        view.backgroundColor = [UIColor blueColor];
+        [self.pointViews addObject:view];
+        [self.scanRectView.window addSubview:view];
+
+        NSValue* windowPointValue = [NSValue valueWithCGPoint:transformedPoint];
 		location = [NSString stringWithFormat:@"%@ (%f, %f)", location, transformedPoint.x, transformedPoint.y];
 		[points addObject:windowPointValue];
 	}
